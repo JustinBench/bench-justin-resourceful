@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Zelda Quiz (v2.0)</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='main/style.css') }}">
+    </head>
+    <body>
+        <header>
+            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
+            <h1 id="title">The Legend of Zelda Trivia! (v2.0)</h1>
+            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
+        </header>
+        <nav>
+            <p class="info-container">In honor of The Legend of Zelda's 40th anniversary this year, I thought I would do a quiz on Legend of Zelda trivia! Questions are stored in a database which anybody can add to since I'm way too trusting!</p>
+            <ul class="navigation-list">
+                <li class="navigation-link"><a href="/">Home</a></li>
+                <li class="navigation-link"><a href="/quiz/add_questions">Add Questions</a></li>
+                <li class="navigation-link"><a href="/original">v1.0</a></li>
+                <li class="navigation-link"><a href="/about_me">About the Creator</a></li>
+            </ul>
+        </nav>
+        <main>
+            <form id="question-amount-form" onsubmit="loadLocalQuestions(Number(this.elements.amount.value)); return false;">
+                <label for="question-amount">Number of questions (0 for all)</label>
+                <input id="question-amount" name="amount" type="number" min="0" value="0" required>
+                <button type="submit">Start quiz</button>
+            </form>
+            <section id="question-container"></section>
+            <section id="result-container" class="hidden">
+                <h2>Results</h2>
+                <p>You scored <span id="correct-answers">0</span> out of <span id="total-questions"></span>.</p>
+                <img id="zero-score-image" class="hidden" src="{{ url_for('static', filename='project_two/media/pig_cliff.gif') }}" alt="A pig standing on a cliff">
+                <img id="perfect-score-image" class="hidden" src="{{ url_for('static', filename='project_two/media/tri-force-heroes-cheer.gif') }}" alt="The Tri Force Heroes cheerleading gif">
+            </section>
+            <button id="refresh-page-button" class="hidden" type="button">Play Again</button>
+        </main>
+        <footer>
+            <h3>Contact</h3>
+            <ul class="contact-list">
+                <li class="contact-link">School Email: <a href="mailto:d00188916@utahtech.edu" target="_blank">d00188916@utahtech.edu</a></li>
+                <li class="contact-link">LinkedIn: <a href="https://www.linkedin.com/in/justin-bench" target="_blank">linkedin.com/in/justin-bench</a></li>
+                <li class="contact-link">GitHub: <a href="https://github.com/JustinBench" target="_blank">github.com/JustinBench</a></li>
+                <li class="contact-link">Facebook: <a href="https://m.facebook.com/worthabench/" target="_blank">m.facebook.com/worthabench</a></li>
+                <li class="contact-link">Itch.io: <a href="https://rubberduck-1.itch.io/" target="_blank">rubberduck-1.itch.io</a></li>
+                <li class="contact-link">YouTube: <a href="https://www.youtube.com/@rubberducknegativeone" target="_blank">youtube.com/@rubberducknegativeone</a></li>
+            </ul>
+        </footer>
+        <script src="{{ url_for('static', filename='main/script.js') }}"></script>
+    </body>
+</html>

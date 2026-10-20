@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Zelda Trivia</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='main/style.css') }}">
+    </head>
+    <body>
+        <header>
+            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
+            <h1 id="title">The Legend of Zelda Trivia! (v2.0)</h1>
+            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
+        </header>
+        <nav>
+            <p class="info-container">In honor of The Legend of Zelda's 40th anniversary this year, I thought I would do a quiz on Legend of Zelda trivia! Questions are stored in a database which anybody can add to since I'm way too trusting!</p>
+            <ul class="navigation-list">
+                <li class="navigation-link"><a href="/quiz/take_quiz">Take a Quiz</a></li>
+                <li class="navigation-link"><a href="/quiz/add_questions">Add Questions</a></li>
+                <li class="navigation-link"><a href="/original">v1.0</a></li>
+                <li class="navigation-link"><a href="/about_me">About the Creator</a></li>
+            </ul>
+        </nav>
+        <main>
+            <section class="home-welcome" aria-labelledby="welcome-title">
+                <p class="home-eyebrow">A fan-made trivia collection</p>
+                <h2 id="welcome-title">How well do you know Hyrule?</h2>
+                <p>Test your Legend of Zelda knowledge, or contribute a question of your own to the growing collection.</p>
+                <div class="home-actions">
+                    <a class="home-action" href="/quiz/take_quiz">
+                        <span class="home-action-icon" aria-hidden="true">?</span>
+                        <span class="home-action-copy">
+                            <strong>Take a quiz</strong>
+                            <span>See how many questions you can answer.</span>
+                        </span>
+                        <span class="home-action-arrow" aria-hidden="true">→</span>
+                    </a>
+                    <a class="home-action home-action-secondary" href="/quiz/add_questions">
+                        <span class="home-action-icon" aria-hidden="true">+</span>
+                        <span class="home-action-copy">
+                            <strong>Add a question</strong>
+                            <span>Share a piece of Zelda trivia with everyone.</span>
+                        </span>
+                        <span class="home-action-arrow" aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <h3>Contact</h3>
+            <ul class="contact-list">
+                <li class="contact-link">School Email: <a href="mailto:d00188916@utahtech.edu" target="_blank">d00188916@utahtech.edu</a></li>
+                <li class="contact-link">LinkedIn: <a href="https://www.linkedin.com/in/justin-bench" target="_blank">linkedin.com/in/justin-bench</a></li>
+                <li class="contact-link">GitHub: <a href="https://github.com/JustinBench" target="_blank">github.com/JustinBench</a></li>
+                <li class="contact-link">Facebook: <a href="https://m.facebook.com/worthabench/" target="_blank">m.facebook.com/worthabench</a></li>
+                <li class="contact-link">Itch.io: <a href="https://rubberduck-1.itch.io/" target="_blank">rubberduck-1.itch.io</a></li>
+                <li class="contact-link">YouTube: <a href="https://www.youtube.com/@rubberducknegativeone" target="_blank">youtube.com/@rubberducknegativeone</a></li>
+            </ul>
+        </footer>
+        <script src="{{ url_for('static', filename='main/script.js') }}"></script>
+    </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Zelda Quiz</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='project_two/zelda.css') }}">
+    </head>
+    <body>
+        <header>
+            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
+            <h1 id="title">The Legend of Zelda Trivia!</h1>
+            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
+        </header>
+        <nav>
+            <p class="info-container">In honor of The Legend of Zelda's 40th anniversary this year, I thought I would do a quiz on Legend of Zelda trivia! Questions come from <a href="https://opentdb.com" target="_blank" class="question-source">opentdb.com</a>, which doesn't actually have that many Zelda questions.</p>
+        </nav>
+        <main>
+            <section class="loading-warning"><img class="load-logo hidden" alt="loading animation" src="{{ url_for('static', filename='project_two/media/items.gif') }}"><span class="load-text">Loading questions...</span></section>
+            <section id="question-container"></section>
+            <section id="result-container" class="hidden">
+                <h2>Results</h2>
+                <p>You scored <span id="correct-answers">0</span> out of <span id="total-questions"></span>. Now go do something more exciting with your life.</p>
+                <p id="life-suggestion">You could go add more questions to <a href="https://opentdb.com" target="_blank" class="question-source">opentdb.com</a> if you want this quiz to be more exciting.</p>
+                <img id="zero-score-image" class="hidden" src="{{ url_for('static', filename='project_two/media/pig_cliff.gif') }}" alt="A pig standing on a cliff">
+                <img id="perfect-score-image" class="hidden" src="{{ url_for('static', filename='project_two/media/tri-force-heroes-cheer.gif') }}" alt="The Tri Force Heroes cheerleading gif">
+            </section>
+        </main>
+        <footer>
+            <h3>Contact</h3>
+            <ul>
+                <li>School Email: <a href="mailto:d00188916@utahtech.edu" target="_blank">d00188916@utahtech.edu</a></li>
+                <li>LinkedIn: <a href="https://www.linkedin.com/in/justin-bench" target="_blank">linkedin.com/in/justin-bench</a></li>
+                <li>GitHub: <a href="https://github.com/JustinBench" target="_blank">github.com/JustinBench</a></li>
+                <li>Facebook: <a href="https://m.facebook.com/worthabench/" target="_blank">m.facebook.com/worthabench</a></li>
+                <li>Itch.io: <a href="https://rubberduck-1.itch.io/" target="_blank">rubberduck-1.itch.io</a></li>
+                <li>YouTube: <a href="https://www.youtube.com/@rubberducknegativeone" target="_blank">youtube.com/@rubberducknegativeone</a></li>
+            </ul>
+        </footer>
+        <script src="{{ url_for('static', filename='project_two/zelda.js') }}"></script>
+    </body>
+</html>

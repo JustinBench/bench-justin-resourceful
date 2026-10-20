@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Justin Bench</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='project_one/me_style.css') }}">
+    </head>
+    <body>
+        <header>
+            <h1>Justin Bench</h1>
+        </header>
+        <nav>
+            <button class="tab" onclick="showBio()">BIO</button>
+            <button class="tab" onclick="showInterests()">PICTURES</button>
+            <button class="tab" onclick="showGoals()">GOALS</button>
+        </nav>
+        <main>
+            <section id="bio" class="tab-content">
+                <p>I've always enjoyed music, art, and storytelling. Video games are pretty much a combination of all those mediums, so I've grown to really love video games.
+                    A random, fun fact about me is that I had a titanium rod in my chest for three years. I'm from St. George, so I'm used to the heat, but I still don't like the heat.
+                    A few summers ago, I built myself an arcade machine that can play a video game I developed called "The Game" since I'm really creative. I'm currently working on a sequel.
+                </p>
+                <div class="game-embed">
+                    <iframe frameborder="0" src="https://itch.io/embed/1560417?bg_color=76691c&amp;fg_color=ffffff&amp;link_color=efff58&amp;border_color=333333" width="552" height="167"><a href="https://rubberduck-1.itch.io/the-game">The Game by RubberDuck-1</a></iframe>
+                </div>
+                </section>
+            <section id="interests" class="tab-content hidden">
+                <div class="img-row">
+                    <img src="{{ url_for('static', filename='project_one/media/dixie_rock.jpg') }}">
+                    <img src="{{ url_for('static', filename='project_one/media/aang.jpg') }}">
+                    <img src="{{ url_for('static', filename='project_one/media/mariogalaxy.jpg') }}">
+                </div>
+                <div class="img-row">
+                    <img src="{{ url_for('static', filename='project_one/media/korra.jpg') }}">
+                    <img src="{{ url_for('static', filename='project_one/media/theknight.webp') }}">
+                    <img src="{{ url_for('static', filename='project_one/media/arcade.jpg') }}">
+                </div>
+                <div class="img-row">
+                    <img src="{{ url_for('static', filename='project_one/media/mastersword.jpg') }}">
+                    <img src="{{ url_for('static', filename='project_one/media/silksong.jpg') }}">
+                    <img src="{{ url_for('static', filename='project_one/media/the_game_2.png') }}">
+                </div>
+            </section>
+            <section id="goals" class="tab-content hidden">
+                <ul>
+                    <li>I'd like to make an app that applies my Automatic Decibel Correction Algorithm to audio files</li>
+                    <li>This already exists, but it could be fun to recreate a tracker for a Zelda randomizer</li>
+                    <li>I may want to make a Dungeon and Dragons characer generator</li>
+                </ul>
+            </section>
+        </main>
+        <footer>
+            <h3>Contact</h3>
+            <ul>
+                <li>School Email: <a href="mailto:d00188916@utahtech.edu" target="_blank">d00188916@utahtech.edu</a></li>
+                <li>LinkedIn: <a href="https://www.linkedin.com/in/justin-bench" target="_blank">linkedin.com/in/justin-bench</a></li>
+                <li>GitHub: <a href="https://github.com/JustinBench" target="_blank">github.com/JustinBench</a></li>
+                <li>Facebook: <a href="https://m.facebook.com/worthabench/" target="_blank">m.facebook.com/worthabench</a></li>
+                <li>Itch.io: <a href="https://rubberduck-1.itch.io/" target="_blank">rubberduck-1.itch.io</a></li>
+                <li>YouTube: <a href="https://www.youtube.com/@rubberducknegativeone" target="_blank">youtube.com/@rubberducknegativeone</a></li>
+            </ul>
+            <h6>© 2026 Justin Bench</h6>
+        </footer>
+        <script src="{{ url_for('static', filename='project_one/me.js') }}"></script>
+    </body>
+</html>
