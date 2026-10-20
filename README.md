@@ -1,5 +1,18 @@
-# General Goal
-Update the quiz from the last assignment to use an actual SQLite database rather than a simple jsonl file.
+# Notes
+The main goal is to update the quiz from the last assignment to use an actual SQLite database rather than a simple jsonl file.
+
+CORS pretty much is the list of outside sources that are allowed to send (and/or receive?) data from the current site. I think. Still don't quite get it.
+
+Figure out how to implement the other REST methods.
+
+Storing photos doesn't work well for storing photos, which is why you should use a file system instead. Databases are good for storing lots of data (obviously). Not everything needs to be stored in a database!
+
+Make sure this works so it can run on other machines!
+
+Difference between post, put, and patch:
+- Post creates a new object
+- Put replaces an exisiting object with a new object
+- Patch updates some parts of the data of an exisiting object.
 
 # Assignment Details
 
