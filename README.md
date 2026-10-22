@@ -5,7 +5,7 @@ CORS pretty much is the list of outside sources that are allowed to send (and/or
 
 Figure out how to implement the other REST methods.
 
-Storing photos doesn't work well for storing photos, which is why you should use a file system instead. Databases are good for storing lots of data (obviously). Not everything needs to be stored in a database!
+Databases don't work well for storing photos, which is why you should use a file system instead. Databases are good for storing lots of data (obviously). Not everything needs to be stored in a database!
 
 Make sure this works so it can run on other machines!
 

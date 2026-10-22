@@ -3,23 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Zelda Quiz (v2.0)</title>
+        <title>Zelda Quiz (v3.0)</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='main/style.css') }}">
     </head>
     <body>
         <header>
-            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
-            <h1 id="title">The Legend of Zelda Trivia! (v2.0)</h1>
-            <img class="crest" src="{{ url_for('static', filename='project_two/media/hylian_crest.gif') }}" alt="triforce">
+            <img class="crest" src="{{ url_for('static', filename='main/media/hylian_crest.gif') }}" alt="triforce">
+            <h1 id="title">The Legend of Zelda Trivia! (v3.0)</h1>
+            <img class="crest" src="{{ url_for('static', filename='main/media/hylian_crest.gif') }}" alt="triforce">
         </header>
         <nav>
             <p class="info-container">In honor of The Legend of Zelda's 40th anniversary this year, I thought I would do a quiz on Legend of Zelda trivia! Questions are stored in a database which anybody can add to since I'm way too trusting!</p>
             <ul class="navigation-list">
                 <li class="navigation-link"><a href="/">Home</a></li>
                 <li class="navigation-link"><a href="/quiz/add_questions">Add Questions</a></li>
-                <li class="navigation-link"><a href="/original">v1.0</a></li>
-                <li class="navigation-link"><a href="/about_me">About the Creator</a></li>
-            </ul>
+             </ul>
         </nav>
         <main>
             <form id="question-amount-form" onsubmit="loadLocalQuestions(Number(this.elements.amount.value)); return false;">
@@ -31,8 +29,8 @@
             <section id="result-container" class="hidden">
                 <h2>Results</h2>
                 <p>You scored <span id="correct-answers">0</span> out of <span id="total-questions"></span>.</p>
-                <img id="zero-score-image" class="hidden" src="{{ url_for('static', filename='project_two/media/pig_cliff.gif') }}" alt="A pig standing on a cliff">
-                <img id="perfect-score-image" class="hidden" src="{{ url_for('static', filename='project_two/media/tri-force-heroes-cheer.gif') }}" alt="The Tri Force Heroes cheerleading gif">
+                <img id="zero-score-image" class="hidden" src="{{ url_for('static', filename='main/media/pig_cliff.gif') }}" alt="A pig standing on a cliff">
+                <img id="perfect-score-image" class="hidden" src="{{ url_for('static', filename='main/media/tri-force-heroes-cheer.gif') }}" alt="The Tri Force Heroes cheerleading gif">
             </section>
             <button id="refresh-page-button" class="hidden" type="button">Play Again</button>
         </main>
