@@ -259,7 +259,51 @@ input {
     transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
+input[type="file"] {
+    padding: 0.45rem;
+    background: #fdfefd;
+}
+
+input[type="file"]::file-selector-button {
+    min-height: 2rem;
+    margin-right: 0.75rem;
+    padding: 0.35rem 0.7rem;
+    border: 0;
+    border-radius: 0.45rem;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.image-preview {
+    width: min(100%, 16rem);
+    max-height: 12rem;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    background: #f8faf7;
+    object-fit: contain;
+}
+
+select {
+    width: 100%;
+    min-height: 2.9rem;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid #cbd6d1;
+    border-radius: 0.65rem;
+    background: #fdfefd;
+    color: var(--ink);
+    font: inherit;
+}
+
 input:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(24 124 114 / 16%);
+}
+
+select:focus {
     border-color: var(--accent);
     outline: none;
     box-shadow: 0 0 0 3px rgb(24 124 114 / 16%);
@@ -326,6 +370,37 @@ a:focus-visible {
 
 .question {
     width: min(100%, 48rem);
+}
+
+.question-context {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.question-image {
+    width: 3.5rem;
+    height: 3.5rem;
+    padding: 0.35rem;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    background: #f8faf7;
+    object-fit: contain;
+}
+
+.game-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.2rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid #b8d9ce;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    font-size: 0.83rem;
+    font-weight: 750;
+    line-height: 1.25;
 }
 
 .question-header {

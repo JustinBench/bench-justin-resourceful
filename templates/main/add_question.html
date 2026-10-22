@@ -26,12 +26,49 @@
             <form id="add-question-form" onsubmit="submitQuestion(
                 document.getElementById('question-input').value,
                 document.getElementById('correct-input').value,
-                Array.from(document.querySelectorAll('.incorrect-input'), input => input.value)
+                Array.from(document.querySelectorAll('.incorrect-input'), input => input.value),
+                document.getElementById('game-input').value,
+                document.getElementById('image-input').files[0]
             ); return false">
                 <ul>
                     <li>
                         <label for="question-input">Question:</label>
                         <input type="text" id="question-input" name="question" required>
+                    </li>
+                    <li>
+                        <label for="game-input">Game or category:</label>
+                        <select id="game-input" name="game" required>
+                            <option value="" disabled selected>Select a game or category</option>
+                            <option value="The Legend of Zelda">The Legend of Zelda</option>
+                            <option value="Zelda II: The Adventure of Link">Zelda II: The Adventure of Link</option>
+                            <option value="The Legend of Zelda: A Link to the Past">A Link to the Past</option>
+                            <option value="The Legend of Zelda: Link's Awakening">Link's Awakening</option>
+                            <option value="The Legend of Zelda: Ocarina of Time">Ocarina of Time</option>
+                            <option value="The Legend of Zelda: Majora's Mask">Majora's Mask</option>
+                            <option value="The Legend of Zelda: Oracle of Ages/Oracle of Seasons">Oracle of Ages/Oracle of Seasons</option>
+                            <option value="The Legend of Zelda: Four Swords">Four Swords</option>
+                            <option value="The Legend of Zelda: The Wind Waker">The Wind Waker</option>
+                            <option value="The Legend of Zelda: The Minish Cap">The Minish Cap</option>
+                            <option value="The Legend of Zelda: Four Swords Adventures">Four Swords Adventures</option>
+                            <option value="The Legend of Zelda: Twilight Princess">Twilight Princess</option>
+                            <option value="The Legend of Zelda: Phantom Hourglass">Phantom Hourglass</option>
+                            <option value="The Legend of Zelda: Spirit Tracks">Spirit Tracks</option>
+                            <option value="The Legend of Zelda: Skyward Sword">Skyward Sword</option>
+                            <option value="The Legend of Zelda: A Link Between Worlds">A Link Between Worlds</option>
+                            <option value="The Legend of Zelda: Tri-Force Heroes">Tri-Force Heroes</option>
+                            <option value="The Legend of Zelda: Breath of the Wild">Breath of the Wild</option>
+                            <option value="The Legend of Zelda: Tears of the Kingdom">Tears of the Kingdom</option>
+                            <option value="The Legend of Zelda: Echoes of Wisdom">Echoes of Wisdom</option>
+                            <option value="3D Games">3D Games</option>
+                            <option value="2D Games">2D Games</option>
+                            <option value="All">All</option>
+                        </select>
+                    </li>
+                    <li>
+                        <label for="image-input">Question image (optional):</label>
+                        <input type="file" id="image-input" name="image" accept="image/png,image/jpeg,image/gif,image/webp">
+                        <small>PNG, JPEG, GIF, or WebP; up to 5 MB. Leave empty to use Hestu's Gift.</small>
+                        <img id="image-preview" class="image-preview hidden" alt="Preview of the selected question image">
                     </li>
                     <li>
                         <label for="correct-input">Correct Answer:</label>

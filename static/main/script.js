@@ -24,6 +24,25 @@ function createQuestion(questionObj, questionNum, totalQuestions) {
     const newQuestionSection = document.createElement('section');
     newQuestionSection.classList.add('hidden','question');
 
+    const questionContext = document.createElement('div');
+    questionContext.classList.add('question-context');
+
+    const gameLabel = document.createElement('span');
+    gameLabel.classList.add('game-label');
+    gameLabel.textContent = questionObj.game || 'Misc';
+
+    const imageName = typeof questionObj.img === 'string' && questionObj.img.trim()
+        ? questionObj.img.trim().split(/[\\/]/).pop()
+        : 'hestus_gift.png';
+    const imageFilename = imageName.includes('.') ? imageName : `${imageName}.png`;
+    const questionImage = document.createElement('img');
+    questionImage.classList.add('question-image');
+    questionImage.src = `/static/main/media/${encodeURIComponent(imageFilename)}`;
+    questionImage.alt = `${gameLabel.textContent} associated image`;
+    questionImage.addEventListener('error', () => {
+        questionImage.src = '/static/main/media/hestus_gift.png';
+    }, { once: true });
+
     const questionHeader = document.createElement('h4');
     questionHeader.textContent = `Question ${questionNum}/${totalQuestions}:`
     questionHeader.classList.add('question-header');
@@ -57,6 +76,9 @@ function createQuestion(questionObj, questionNum, totalQuestions) {
         answersList.appendChild(li);
     });
 
+    questionContext.appendChild(questionImage);
+    questionContext.appendChild(gameLabel);
+    newQuestionSection.appendChild(questionContext);
     newQuestionSection.appendChild(questionHeader);
     newQuestionSection.appendChild(questionText);
     newQuestionSection.appendChild(answersList);
@@ -142,7 +164,7 @@ function nextQuestion() {
     }
 }
 
-async function submitQuestion(question, correctAnswer, incorrectAnswers) {
+async function submitQuestion(question, correctAnswer, incorrectAnswers, game, uploadedImage) {
     const existingQuestions = await fetchQuestions();
     const normalizedQuestion = question.trim().toLowerCase();
 
@@ -157,18 +179,18 @@ async function submitQuestion(question, correctAnswer, incorrectAnswers) {
     } else if (!normalizedQuestion.includes("zelda")) {
         message = 'The question must be about a Zelda game (include the word "Zelda").';
     } else {
-        const questionData = {
-            question: question,
-            correct_answer: correctAnswer,
-            incorrect_answers: incorrectAnswers
-        };
+        const questionData = new FormData();
+        questionData.append("question", question);
+        questionData.append("correct_answer", correctAnswer);
+        questionData.append("game", game.trim());
+        incorrectAnswers.forEach(answer => questionData.append("incorrect_answers", answer));
+        if (uploadedImage) {
+            questionData.append("image", uploadedImage);
+        }
 
         const response = await fetch("/messages", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(questionData)
+            body: questionData
         });
 
         if (!response.ok) {
@@ -183,4 +205,37 @@ async function submitQuestion(question, correctAnswer, incorrectAnswers) {
     const result_message = document.getElementById('form-result-message');
     result_message.textContent = message;
     result_message.classList.remove('hidden');
+}
+
+const imageInput = document.getElementById('image-input');
+const imagePreview = document.getElementById('image-preview');
+
+if (imageInput && imagePreview) {
+    let previewUrl;
+
+    imageInput.addEventListener('change', () => {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+
+        const image = imageInput.files[0];
+        if (!image) {
+            imagePreview.removeAttribute('src');
+            imagePreview.classList.add('hidden');
+            return;
+        }
+
+        previewUrl = URL.createObjectURL(image);
+        imagePreview.src = previewUrl;
+        imagePreview.classList.remove('hidden');
+    });
+
+    document.getElementById('add-question-form').addEventListener('reset', () => {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = undefined;
+        }
+        imagePreview.removeAttribute('src');
+        imagePreview.classList.add('hidden');
+    });
 }
