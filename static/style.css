@@ -144,7 +144,7 @@ main {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     max-width: 48rem;
-    margin: 0 auto;
+    margin: 0 auto 1rem auto;
     text-align: left;
 }
 

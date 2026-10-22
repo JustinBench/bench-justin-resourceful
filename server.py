@@ -12,7 +12,7 @@ MAX_IMAGE_SIZE = 5 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = MAX_IMAGE_SIZE + 64 * 1024
 CORS(app, origins=["https://opentdb.com"])
 
-MEDIA_DIRECTORY = Path(__file__).parent / "static" / "main" / "media"
+MEDIA_DIRECTORY = Path(__file__).parent / "static" / "media"
 
 
 def image_extension(contents):
@@ -33,15 +33,15 @@ def handle_large_upload(error):
 
 @app.route("/")
 def main():
-    return render_template("main/index.html")
+    return render_template("index.html")
 
 @app.route("/quiz/add_questions")
 def add_question():
-    return render_template("main/add_question.html")
+    return render_template("add_question.html")
 
 @app.route("/quiz/take_quiz")
 def take_quiz():
-    return render_template("main/quiz.html")
+    return render_template("quiz.html")
 
 @app.route("/messages", methods=["GET"])
 def get_questions():
@@ -142,14 +142,6 @@ def post_new_question():
         return "", 201
     else:
         return jsonify({"error": "Could not save question"}), 500
-
-@app.route("/about_me")
-def project_one():
-    return render_template("project_one/about_me.html")
-
-@app.route("/original")
-def project_two():
-    return render_template("project_two/zelda.html")
 
 if __name__ == "__main__":
     app.run()
