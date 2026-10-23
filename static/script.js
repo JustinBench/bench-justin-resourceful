@@ -37,10 +37,10 @@ function createQuestion(questionObj, questionNum, totalQuestions) {
     const imageFilename = imageName.includes('.') ? imageName : `${imageName}.png`;
     const questionImage = document.createElement('img');
     questionImage.classList.add('question-image');
-    questionImage.src = `/static/main/media/${encodeURIComponent(imageFilename)}`;
+    questionImage.src = `/static/media/${encodeURIComponent(imageFilename)}`;
     questionImage.alt = `${gameLabel.textContent} associated image`;
     questionImage.addEventListener('error', () => {
-        questionImage.src = '/static/main/media/hestus_gift.png';
+        questionImage.src = '/static/media/hestus_gift.png';
     }, { once: true });
 
     const questionHeader = document.createElement('h4');
@@ -86,6 +86,11 @@ function createQuestion(questionObj, questionNum, totalQuestions) {
     questionsSection.appendChild(newQuestionSection);
 }
 
+function createReviewQuestion(questionObj) {
+    let reviewSection = document.getElementsByClassName("review-questions");
+    // Show the question text, then buttons which allow to delete or edit the text
+}
+
 function handleAnswerClick(event) {
     const clickedButton = event.currentTarget;
     const answerLists = document.querySelectorAll('.answers-list');
@@ -116,7 +121,7 @@ function decodeHTML(str) {
 }
 
 async function fetchQuestions() {
-    const response = await fetch("/messages");
+    const response = await fetch("/questions-and-answers");
 
     if (!response.ok) {
         throw new Error(`The server returned ${response.status}`);
@@ -188,7 +193,7 @@ async function submitQuestion(question, correctAnswer, incorrectAnswers, game, u
             questionData.append("image", uploadedImage);
         }
 
-        const response = await fetch("/messages", {
+        const response = await fetch("/questions-and-answers", {
             method: "POST",
             body: questionData
         });

@@ -8,6 +8,7 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+data.create_table()
 MAX_IMAGE_SIZE = 5 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = MAX_IMAGE_SIZE + 64 * 1024
 CORS(app, origins=["https://opentdb.com"])
@@ -26,7 +27,6 @@ def image_extension(contents):
         return ".webp"
     return None
 
-
 @app.errorhandler(RequestEntityTooLarge)
 def handle_large_upload(error):
     return jsonify({"error": "Uploaded files must be 5 MB or smaller"}), 413
@@ -35,20 +35,24 @@ def handle_large_upload(error):
 def main():
     return render_template("index.html")
 
-@app.route("/quiz/add_questions")
+@app.route("/add_questions")
 def add_question():
     return render_template("add_question.html")
 
-@app.route("/quiz/take_quiz")
+@app.route("/take_quiz")
 def take_quiz():
     return render_template("quiz.html")
 
-@app.route("/messages", methods=["GET"])
-def get_questions():
+@app.route("/view_questions")
+def review():
+    return render_template("questions.html")
+
+@app.route("/questions-and-answers", methods=["GET"])
+def get_questions_and_answers():
     questions = data.give_questions()
     return jsonify(questions), 200
 
-@app.route("/messages", methods=["POST"])
+@app.route("/questions-and-answers", methods=["POST"])
 def post_new_question():
     if request.is_json:
         payload = request.get_json(silent=True)

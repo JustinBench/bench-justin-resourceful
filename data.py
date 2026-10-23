@@ -8,6 +8,21 @@ def open_connection() -> tuple[Connection, Cursor]:
 def close_connection(con: Connection):
     con.close()
 
+def create_table():
+    con, cur = open_connection()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS question (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            text TEXT NOT NULL,
+            correct_answer TEXT NOT NULL,
+            incorrect_answers TEXT NOT NULL,
+            game TEXT NOT NULL,
+            img TEXT NOT NULL,
+            UNIQUE(game, text)
+        );
+    """)
+    close_connection(con)
+
 #When receiving a tuple ("question-text", "correct-answer", "incorrect-answer", "game", "img-file"):
 def add_question(question_obj: tuple) -> bool:
     con, cur = open_connection()
@@ -70,7 +85,6 @@ def give_questions() -> list[dict[str, str | list[str]]]:
     finally:
         close_connection(con)
 
-def list_questions() -> list[str]:
     questions = []
     con, cur = open_connection()
     for row in cur.execute("SELECT text FROM question ORDER BY game"):
