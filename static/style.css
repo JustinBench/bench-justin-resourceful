@@ -105,7 +105,7 @@ main {
     width: min(100% - 2rem, 68rem);
     flex: 1;
     margin: 0 auto;
-    padding: clamp(2rem, 6vw, 4rem) 0;
+    padding: clamp(1rem, 3vw, 2rem) 0;
 }
 
 .home-welcome {
@@ -448,7 +448,87 @@ a:focus-visible {
     overflow-wrap: anywhere;
 }
 
+.review-questions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr));
+    align-items: start;
+    gap: 1.1rem;
+    margin-top: 1.5rem;
+}
+
+.review-question {
+    min-width: 0;
+    padding: clamp(1.1rem, 3vw, 1.6rem);
+    border: 1px solid #ddcfbf;
+    border-left: 0.35rem solid var(--warm);
+    border-radius: 0.9rem;
+    background: linear-gradient(145deg, #fffefa, #f8f2e9);
+    box-shadow: 0 9px 24px rgba(52, 31, 31, 0.07);
+}
+
+.review-question .question-context {
+    margin-bottom: 0.85rem;
+}
+
+.review-question .question-image {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 0.7rem;
+    background: #fff;
+}
+
+.review-question > p {
+    margin: 0 0 1rem;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.review-answers-list {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.review-answers-list li {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.review-answers-list .review-correct-answer {
+    border-color: #a8c9b6;
+    background: #edf6ef;
+}
+
+.review-answers-list .review-incorrect-answer {
+    color: #625756;
+}
+
+.edit-question-button {
+    display: block;
+    margin: 1rem 0 0 auto;
+    background: #6d503f;
+}
+
+.edit-question-button:hover {
+    background: #503a2d;
+}
+
+#review-header {
+    text-align: center;
+}
+
 #result-container {
+    position: relative;
+    min-height: 13rem;
     text-align: center;
 }
 
@@ -463,6 +543,15 @@ a:focus-visible {
     max-height: 18rem;
     border-radius: 0.9rem;
     object-fit: contain;
+}
+
+#zero-score-image {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: min(36%, 10rem);
+    max-height: 8rem;
+    border-radius: 0 0 1.25rem 0;
 }
 
 .hidden {

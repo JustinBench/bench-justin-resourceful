@@ -23,7 +23,6 @@ def create_table():
     """)
     close_connection(con)
 
-#When receiving a tuple ("question-text", "correct-answer", "incorrect-answer", "game", "img-file"):
 def add_question(question_obj: tuple) -> bool:
     con, cur = open_connection()
     if len(question_obj) != 5:
@@ -67,28 +66,42 @@ def give_questions() -> list[dict[str, str | list[str]]]:
     con, cur = open_connection()
     try:
         cur.execute("""
-            SELECT text, correct_answer, incorrect_answers, game, img
+            SELECT id, text, correct_answer, incorrect_answers, game, img
             FROM question
-            ORDER BY game
+            ORDER BY id
         """)
 
         return [
             {
+                "id": question_id,
                 "question": text,
                 "correct_answer": correct_answer,
                 "incorrect_answers": json.loads(incorrect_answers),
                 "game": game,
                 "img": img
             }
-            for text, correct_answer, incorrect_answers, game, img in cur.fetchall()
+            for question_id, text, correct_answer, incorrect_answers, game, img in cur.fetchall()
         ]
     finally:
         close_connection(con)
 
-    questions = []
+def get_question(id: int) -> dict | None:
     con, cur = open_connection()
-    for row in cur.execute("SELECT text FROM question ORDER BY game"):
-        questions.append(row[0])
-        print(row[0])
-    close_connection(con)
-    return questions
+    try:
+        cur.execute("""
+            SELECT id, text, correct_answer, incorrect_answers, game, img
+            FROM question
+            WHERE id = ?
+        """, (id,))
+        row = cur.fetchone()
+        if row is None:
+            return None
+        question_id, text, correct_answer, incorrect_answers, game, img = row
+        return {"id": question_id,
+                "question": text,
+                "correct_answer": correct_answer,
+                "incorrect_answers": json.loads(incorrect_answers),
+                "game": game,
+                "img": img}
+    finally:
+        close_connection(con)

@@ -47,12 +47,19 @@ def take_quiz():
 def review():
     return render_template("questions.html")
 
-@app.route("/questions-and-answers", methods=["GET"])
+@app.route("/questions_and_answers", methods=["GET"])
 def get_questions_and_answers():
     questions = data.give_questions()
     return jsonify(questions), 200
 
-@app.route("/questions-and-answers", methods=["POST"])
+@app.route("/questions-and-answers/<int:question_id>", methods=["GET"])
+def get_quiz_question(question_id):
+    question = data.get_question(question_id)
+    if question is None:
+        return jsonify({"error": f"No question found with ID {question_id}"}), 404
+    return jsonify(question), 200
+
+@app.route("/questions_and_answers", methods=["POST"])
 def post_new_question():
     if request.is_json:
         payload = request.get_json(silent=True)

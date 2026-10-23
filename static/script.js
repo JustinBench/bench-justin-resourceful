@@ -87,9 +87,78 @@ function createQuestion(questionObj, questionNum, totalQuestions) {
 }
 
 function createReviewQuestion(questionObj) {
-    let reviewSection = document.getElementsByClassName("review-questions");
-    // Show the question text, then buttons which allow to delete or edit the text
+    const reviewSection = document.querySelector('.review-questions');
+    if (!reviewSection) return;
+
+    const newReviewQuestion = document.createElement('section');
+    newReviewQuestion.classList.add('review-question');
+
+    const questionContext = document.createElement('div');
+    questionContext.classList.add('question-context');
+
+    const gameLabel = document.createElement('span');
+    gameLabel.classList.add('game-label');
+    gameLabel.textContent = questionObj.game || 'Misc';
+
+    const imageName = typeof questionObj.img === 'string' && questionObj.img.trim()
+        ? questionObj.img.trim().split(/[\\/]/).pop()
+        : 'hestus_gift.png';
+    const imageFilename = imageName.includes('.') ? imageName : `${imageName}.png`;
+    const questionImage = document.createElement('img');
+    questionImage.classList.add('question-image');
+    questionImage.src = `/static/media/${encodeURIComponent(imageFilename)}`;
+    questionImage.alt = `${gameLabel.textContent} associated image`;
+    questionImage.addEventListener('error', () => {
+        questionImage.src = '/static/media/hestus_gift.png';
+    }, { once: true });
+
+    const questionText = document.createElement('p');
+    questionText.textContent = decodeHTML(questionObj.question);
+
+    const answersList = document.createElement('ul');
+    answersList.classList.add('review-answers-list');
+
+    const answers = [
+        { text: questionObj.correct_answer, correct: true },
+        ...(questionObj.incorrect_answers || []).map(answer => ({ text: answer, correct: false }))
+    ];
+    answers.forEach(answer => {
+        const li = document.createElement('li');
+        li.classList.add(answer.correct ? 'review-correct-answer' : 'review-incorrect-answer');
+        li.textContent = `${answer.correct ? 'Correct: ' : 'Incorrect: '}${decodeHTML(answer.text)}`;
+        answersList.appendChild(li);
+    });
+
+    const editButton = document.createElement('button');
+    editButton.type = 'button';
+    editButton.classList.add('edit-question-button');
+    editButton.textContent = 'Edit question';
+    editButton.setAttribute('aria-label', `Edit question ${questionObj.id}`);
+
+    questionContext.appendChild(questionImage);
+    questionContext.appendChild(gameLabel);
+    newReviewQuestion.appendChild(questionContext);
+    newReviewQuestion.appendChild(questionText);
+    newReviewQuestion.appendChild(answersList);
+    newReviewQuestion.appendChild(editButton);
+    reviewSection.appendChild(newReviewQuestion);
 }
+
+async function loadReviewQuestions() {
+    const reviewSection = document.querySelector('.review-questions');
+    if (!reviewSection) return;
+
+    try {
+        const questions = await fetchQuestions();
+        reviewSection.replaceChildren();
+        questions.forEach(createReviewQuestion);
+    } catch (error) {
+        console.error('Unable to load review questions:', error);
+        reviewSection.textContent = 'Unable to load questions right now.';
+    }
+}
+
+loadReviewQuestions();
 
 function handleAnswerClick(event) {
     const clickedButton = event.currentTarget;
@@ -121,7 +190,7 @@ function decodeHTML(str) {
 }
 
 async function fetchQuestions() {
-    const response = await fetch("/questions-and-answers");
+    const response = await fetch("/questions_and_answers");
 
     if (!response.ok) {
         throw new Error(`The server returned ${response.status}`);
@@ -130,22 +199,45 @@ async function fetchQuestions() {
     return await response.json();
 }
 
-async function loadLocalQuestions(amount=-1) {
+async function selectQuestionIds(requestAmount) {
+    const questions = await fetchQuestions();
+    const availableIds = questions.map(question => question.id);
+
+    const amount = requestAmount === 0 ? availableIds.length : Math.min(requestAmount, availableIds.length);
+
+    const selectedIds = [];
+
+    while (selectedIds.length < amount) {
+        const randomIndex = Math.floor(Math.random() * availableIds.length);
+        selectedIds.push(availableIds.splice(randomIndex, 1)[0]);
+    }
+
+    return selectedIds;
+}
+
+async function fetchQuestionById(id) {
+    const response = await fetch(`/questions-and-answers/${id}`);
+
+    if (!response.ok) {
+        throw new Error(`Could not retrieve question ${id}: ${response.status}`)
+    }
+
+    return response.json();
+}
+
+async function loadLocalQuestions(amount=0) {
     try {
-        const questionObjects = await fetchQuestions();
+        const ids = await selectQuestionIds(amount);
 
-        const shuffledQuestions = shuffle(questionObjects, amount);
-
-        if (amount == 0) {
-            amount = shuffledQuestions.length;
+        for (let index = 0; index < ids.length; index++) {
+            const question = await fetchQuestionById(ids[index]);
+            createQuestion(question, index + 1, ids.length);
         }
 
-        for (let index = 0; index < amount; index++) {
-            createQuestion(shuffledQuestions[index], index + 1, amount);
+        if (ids.length > 0) {
+            showQuestion(currentQuestion);
+            start_quiz_form.classList.add('hidden');
         }
-
-        showQuestion(currentQuestion);
-        start_quiz_form.classList.add('hidden');
     } catch (error) {
         console.error("Unable to load questions:", error);
     }
@@ -193,7 +285,7 @@ async function submitQuestion(question, correctAnswer, incorrectAnswers, game, u
             questionData.append("image", uploadedImage);
         }
 
-        const response = await fetch("/questions-and-answers", {
+        const response = await fetch("/questions_and_answers", {
             method: "POST",
             body: questionData
         });
