@@ -1,6 +1,4 @@
-import json
-import re
-import uuid
+import json, re, uuid, sqlite3
 from data import DataBase
 from pathlib import Path
 from flask import Flask, render_template, jsonify, request
@@ -13,9 +11,15 @@ db = DataBase()
 db.create_table()
 MAX_IMAGE_SIZE = 5 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = MAX_IMAGE_SIZE + 64 * 1024
-CORS(app, origins=[])
+CORS(
+    app,
+    origins="*",
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type"],
+    supports_credentials=False,
+)
 
-MEDIA_DIRECTORY = Path(__file__).parent / "static" / "media"
+MEDIA_DIRECTORY = Path(__file__).resolve().parent / "static" / "media"
 
 
 def image_extension(contents):
@@ -50,6 +54,18 @@ def delete_uploaded_image(image_name):
 @app.errorhandler(RequestEntityTooLarge)
 def handle_large_upload(error):
     return jsonify({"error": "Uploaded files must be 5 MB or smaller"}), 413
+
+@app.errorhandler(404)
+def handle_not_found(error):
+    if request.path.startswith("/questions_and_answers"):
+        return jsonify({"error": "API route or question not found"}), 404
+    return error
+
+@app.errorhandler(405)
+def handle_method_not_allowed(error):
+    if request.path.startswith("/questions_and_answers"):
+        return jsonify({"error": "Method not allowed for this API route"}), 405
+    return error
 
 @app.route("/")
 def main():
@@ -101,6 +117,12 @@ def replace_question(question_id):
     incorrect_answers = [answer.strip() for answer in request.form.getlist("incorrect_answers")]
     game = request.form.get("game", "").strip()
     image = request.form.get("img", existing["img"])
+
+    if any(not answer for answer in incorrect_answers):
+        return jsonify({
+            "error": "Incorrect answers must not be empty"
+        }), 400
+
     uploaded_image = request.files.get("image")
     image_contents = None
     if uploaded_image and uploaded_image.filename:
@@ -128,6 +150,12 @@ def replace_question(question_id):
     question_obj = (question, correct_answer, incorrect_answers, game, image)
     try:
         replaced = db.replace_question(question_id, question_obj)
+    except sqlite3.IntegrityError:
+        if image_contents is not None:
+            delete_uploaded_image(image)
+        return jsonify({
+            "error": "A question with this text already exists for that game"
+        }), 409
     except Exception:
         if image_contents is not None:
             delete_uploaded_image(image)
@@ -234,8 +262,11 @@ def post_new_question():
 
     if db.add_question(new_question):
         return "", 201
-    else:
-        return jsonify({"error": "Could not save question"}), 500
+
+    if image_contents is not None:
+        delete_uploaded_image(new_question[4])
+
+    return jsonify({"error": "A question with this text already exists for that game"}), 409
 
 if __name__ == "__main__":
     app.run()

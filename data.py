@@ -1,13 +1,16 @@
 from sqlite3 import *
 import json
+from pathlib import Path
+
+DATABASE_PATH = Path(__file__).resolve().parent / "questions.db"
 
 class DataBase:
-    def __init__():
-        con: Connection = None
-        cur: Cursor = None
+    def __init__(self):
+        self.con: Connection = None
+        self.cur: Cursor = None
 
     def open_connection(self) -> tuple[Connection, Cursor]:
-        self.con = connect("questions.db")
+        self.con = connect(str(DATABASE_PATH))
         self.cur = self.con.cursor()
 
     def close_connection(self) -> None:
@@ -87,7 +90,7 @@ class DataBase:
                     "game": game,
                     "img": img
                 }
-                for question_id, text, correct_answer, incorrect_answers, game, img in cur.fetchall()
+                for question_id, text, correct_answer, incorrect_answers, game, img in self.cur.fetchall()
             ]
         finally:
             self.close_connection()

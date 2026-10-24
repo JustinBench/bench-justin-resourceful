@@ -1,76 +1,113 @@
-# Notes
-The main goal is to update the quiz from the last assignment to use an actual SQLite database rather than a simple jsonl file.
+# Zelda Trivia Question API
 
-CORS pretty much is the list of outside sources that are allowed to send (and/or receive?) data from the current site. I think. Still don't quite get it.
-
-Figure out how to implement the other REST methods.
-
-Databases don't work well for storing photos, which is why you should use a file system instead. Databases are good for storing lots of data (obviously). Not everything needs to be stored in a database!
-
-Make sure this works so it can run on other machines!
-
-Difference between post, put, and patch:
-- Post creates a new object
-- Put replaces an exisiting object with a new object
-- Patch updates some parts of the data of an exisiting object.
-
-# Assignment Details
+A small Flask application for a Zelda trivia quiz. Questions are stored in SQLite, and the browser uses the API to list questions, retrieve individual questions, add questions, replace them, and delete them. Uploaded question images are saved under `static/media/`.
 
 ## Resource
-- Define a single resource that your web application will manage. Also define a simple data model for your resource that includes at least five attributes (not including the unique identifier).
 
-## Server API
-Using Python, create a server web application which implements an API that supports full CRUD operations for your resource, according to the following specifications:
+The resource is a **Question**. Its database-generated identifier is `id`. Its five data attributes are:
 
-- Five RESTful routes, each implemented using the appropriate request method and path, response headers, and response status codes (including any error conditions):
+| Attribute | Meaning |
+| --- | --- |
+| `text` | The question text (returned by the API as `question`) |
+| `correct_answer` | The correct answer |
+| `incorrect_answers` | A JSON array containing three incorrect answers |
+| `game` | The Zelda game or category |
+| `img` | The image filename associated with the question |
 
-    - List: returns a JSON representation of the collection’s members.
+The database enforces uniqueness on `(game, text)`. SQLite generates the integer `id`; clients do not provide or change it.
 
-    - Retrieve: returns a JSON representation of a single member in the collection, as specified by the unique identifier given as a path parameter.
+## Database schema
 
-    - Create: creates a new member within the collection, as specificed by the data parameters given in the request body.
+```sql
+CREATE TABLE question (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT NOT NULL,
+    correct_answer TEXT NOT NULL,
+    incorrect_answers TEXT NOT NULL,
+    game TEXT NOT NULL,
+    img TEXT NOT NULL,
+    UNIQUE(game, text)
+);
+```
 
-    - Replace: updates an existing member in the collection, as specified by the unique identifier given as a path parameter, and by the data parameters given in the request body.
+`DataBase` in `data.py` encapsulates the SQLite operations. The table is created when the Flask application starts. The database file is located next to `data.py`, so starting the server from another working directory still uses the project’s `questions.db`.
 
-    - Delete: removes an existing member from the collection, as specified by the unique identifier given as a path parameter.
+## REST API
 
-- CORS should be implemented server-wide in order to support Ajax requests from client applications. This should include support for both simple requests and preflighted requests, by implementing the OPTIONS method appropriately.
+The collection path is `/questions_and_answers`. The item path is `/questions_and_answers/<question_id>`, where `question_id` is the integer ID assigned by SQLite.
 
-- If a request is received that does not conform to the RESTful routes defined above, then the server should return an appropriate error response, with the correct status code, headers, and content body that properly explain the reason for the response. This should include requests for an invalid route (method/path pair), and requests that specify a nonexistent member of the collection.
+| Operation | Method and path | Behavior and responses |
+| --- | --- | --- |
+| List | `GET /questions_and_answers` | Returns the question collection as JSON (`200`). |
+| Retrieve | `GET /questions_and_answers/<question_id>` | Returns one question as JSON (`200`), or an error JSON response if the ID does not exist (`404`). |
+| Create | `POST /questions_and_answers` | Creates a question from JSON or multipart form data (`201`). Invalid fields or unsupported content type return an error (`400`); oversized image uploads return `413`. |
+| Replace | `PUT /questions_and_answers/<question_id>` | Replaces all editable question attributes from multipart form data (`204`). The existing `id` is unchanged. The current image is retained if no new image is uploaded. Missing IDs return `404`; invalid fields return `400`; oversized image uploads return `413`. |
+| Delete | `DELETE /questions_and_answers/<question_id>` | Deletes the question and its app-uploaded image (`204`), or returns an error if the ID does not exist (`404`). |
 
-## Database
-- Using SQLite, create a valid database schema sufficient to store data records according to the data model that you defined to represent your resource.
+Create and replace accept three repeated `incorrect_answers` form fields. An optional uploaded image is sent in the `image` field. The `img` field contains the current image filename during replacement so it can be retained when no new file is selected.
 
-- Within your server application, create a Python class to encapsulate all database logic for your application. This class will then be utilized by each of the RESTful actions implemented by the server API to interface with the database for all CRUD operations.
+Requests that violate the database's `(game, text)` uniqueness constraint return `409 Conflict` with a JSON error message. Invalid or missing fields and invalid image formats return `400`; uploaded images larger than 5 MB return `413`. Requests for a missing question or an unrecognized path under the API prefix return `404`, and unsupported methods on API routes return `405`. These API errors use JSON responses with an `error` field. Unexpected server errors remain server-side failures (`500`) and should be diagnosed from the server log.
 
-## Client
-- Using JavaScript, create a client web application that communicates with your server application, using its API, on behalf of the user, with the following:
+The quiz chooses random IDs from the list response, then retrieves each selected question through the item endpoint. The review page uses the same API to populate its list and sends Ajax requests for edits and deletes.
 
-    - A list showing the collection of members for your resource, with at least two of the attributes displayed for each member in the list. The list should be able to clearly and effectively display many records. The data for the list should be requested using the appropriate API endpoint. The list should remain updated with any changes made via the functionality described below, using API requests as necessary to receive updated data.
+### Browser page routes
 
-    - A form used to create a new member in the collection, as well as to update an existing member. The form should include a field for each attribute belonging to your resource. When updating, the form fields should be pre-filled such that the user may quickly make a change without re-entering the values. The data from the form should be sent using the appropriate API endpoints.
+These routes serve HTML pages and are separate from the JSON API:
 
-    - Buttons and/or links which accommodate any needed UI transitions, such as to display an empty form to create a new member, or to display a pre-filled form to update an existing member.
+| Path | Page |
+| --- | --- |
+| `/` | Home page |
+| `/take_quiz` | Quiz |
+| `/add_questions` | Add-question form |
+| `/view_questions` | Question review and editing page |
 
-    - A delete button or link associated to each record that allows the user to remove a member from the collection, after confirming the action with the user (hint: use the confirm() method).
+## CORS
 
-    - Optionally, a read-only list of all attributes and associated values for a single member in the collection, using data requested by the retrieve API endpoint. Alternatively, it is sufficient for the user to view the attributes of each member via the pre-filled form described above, using data requested by the list API endpoint.
+Flask-CORS is configured on the Flask app for browser clients. It allows the API’s HTTP methods (`GET`, `POST`, `PUT`, `DELETE`, and `OPTIONS`) and the `Content-Type` request header. Flask/Flask-CORS supplies the preflight response for cross-origin requests. Credentials such as cross-origin cookies are not enabled.
 
-    - All data sent to and received from the server API should be implemented using Ajax requests.
+The current configuration allows all origins for this assignment because a separate deployed client origin has not been specified. This is appropriate for an uncredentialed class demonstration, but a deployed API should replace the wildcard with the exact origin(s) of its client, including scheme and port. CORS controls whether browser JavaScript can read cross-origin responses; it is not authentication or access control.
 
-- You may take liberties to modify your application’s features and purpose from that described above, but the overall specifications and structure listed above should still be met.
+## Run on another machine
 
-- Make your application look professional and presentable. Use valid HTML and CSS to structure and style your application.
+### Requirements
 
-- No third-party JavaScript or CSS libraries or frameworks may be used without prior instructor permission.
+- Python 3.10 or newer
+- `pip` and Python's built-in `venv` module
+- A writable copy of this project directory
 
-# Documentation
-- The following items should be clearly detailed and documented in the README.md within your Git repository:
+SQLite is included with Python. No Node.js, external database server, or separate image service is required.
 
-    - The name of your resource, and the name of each of its attributes.
+### Windows PowerShell
 
-    - The database schema which represents your resource, documented as a valid SQLite CREATE TABLE query.
+From the project directory:
 
-    - All REST endpoints implemented by your API server. Include the name, HTTP method, and path for each.
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe server.py
+```
 
-- Use Markdown  to structure and style the content within your README.md. Go here  to see an example.
+### macOS, Linux, or WSL
+
+From the project directory:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python server.py
+```
+
+Open `http://127.0.0.1:5000/` in a browser. Keep the server running while using the site. The project directory must be writable because the application creates or updates `questions.db` and stores uploaded images in `static/media/`. If `questions.db` is absent, the app creates an empty database and initializes the table on startup.
+
+## Project files
+
+- `server.py` — Flask pages, API routes, request validation, CORS, and image upload handling.
+- `data.py` — `DataBase` class and SQLite schema/CRUD operations.
+- `questions.db` — SQLite database containing the current question collection.
+- `templates/` — HTML pages rendered by Flask.
+- `static/script.js` — quiz, review, add, replace, and delete client behavior.
+- `static/style.css` — page and component styling.
+- `static/media/` — bundled and uploaded question images.
+- `requirements.txt` — Python package dependencies.
