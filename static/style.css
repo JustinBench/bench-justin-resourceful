@@ -512,14 +512,32 @@ a:focus-visible {
     color: #625756;
 }
 
+.review-question-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+
+.review-question-actions button {
+    min-height: 2.6rem;
+    padding: 0.5rem 0.9rem;
+}
+
 .edit-question-button {
-    display: block;
-    margin: 1rem 0 0 auto;
     background: #6d503f;
 }
 
 .edit-question-button:hover {
     background: #503a2d;
+}
+
+.delete-question-button {
+    background: #8b3535;
+}
+
+.delete-question-button:hover {
+    background: #692626;
 }
 
 #review-header {

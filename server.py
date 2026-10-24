@@ -59,6 +59,13 @@ def get_quiz_question(question_id):
         return jsonify({"error": f"No question found with ID {question_id}"}), 404
     return jsonify(question), 200
 
+@app.route("/questions-and-answers/<int:question_id>", methods=["DELETE"])
+def delete_quiz_question(question_id):
+    deleted = data.delete_question(question_id)
+    if not deleted:
+        return jsonify({"error": f"No question found with ID {question_id}"}), 404
+    return "", 204
+
 @app.route("/questions_and_answers", methods=["POST"])
 def post_new_question():
     if request.is_json:

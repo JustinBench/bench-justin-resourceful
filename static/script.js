@@ -135,12 +135,41 @@ function createReviewQuestion(questionObj) {
     editButton.textContent = 'Edit question';
     editButton.setAttribute('aria-label', `Edit question ${questionObj.id}`);
 
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.classList.add('delete-question-button');
+    deleteButton.textContent = 'Delete question';
+    deleteButton.setAttribute('aria-label', `Delete question ${questionObj.id}`);
+    deleteButton.addEventListener('click', async() => {
+        const confirmed = window.confirm(`Delete question ${questionObj.id}? This cannot be undone.`);
+        if (!confirmed) return;
+        deleteButton.disabled = true;
+        try {
+            const response = await fetch(`/questions-and-answers/${questionObj.id}`, {method: 'DELETE'});
+            if (response.status === 404) {
+                throw new Error('This question was already deleted or could not be found.');
+            }
+            if (!response.ok) {
+                throw new Error(`Delete failed: ${response.status}`);
+            }
+            newReviewQuestion.remove();
+        } catch (error) {
+            console.error('Unable to delete question:', error);
+            window.alert(error.message);
+            deleteButton.disabled = false;
+        }
+    });
+
+    const actionButtons = document.createElement('div');
+    actionButtons.classList.add('review-question-actions');
+    actionButtons.append(editButton, deleteButton);
+
     questionContext.appendChild(questionImage);
     questionContext.appendChild(gameLabel);
     newReviewQuestion.appendChild(questionContext);
     newReviewQuestion.appendChild(questionText);
     newReviewQuestion.appendChild(answersList);
-    newReviewQuestion.appendChild(editButton);
+    newReviewQuestion.appendChild(actionButtons);
     reviewSection.appendChild(newReviewQuestion);
 }
 

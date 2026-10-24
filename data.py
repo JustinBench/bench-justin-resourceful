@@ -105,3 +105,12 @@ def get_question(id: int) -> dict | None:
                 "img": img}
     finally:
         close_connection(con)
+
+def delete_question(id: int) -> bool:
+    con, cur = open_connection()
+    try: 
+        cur.execute("DELETE FROM question WHERE id = ?", (id,))
+        con.commit()
+        return cur.rowcount > 0
+    finally:
+        close_connection(con)
