@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 import data
 from pathlib import Path
@@ -26,6 +27,24 @@ def image_extension(contents):
     if contents.startswith(b"RIFF") and contents[8:12] == b"WEBP":
         return ".webp"
     return None
+
+def delete_uploaded_image(image_name):
+    """Remove an app-uploaded image, never a bundled/default image."""
+    if not isinstance(image_name, str) or not image_name:
+        return
+
+    # Uploaded names are generated as 32 hex characters, an underscore,
+    # a sanitized stem, and a supported extension. Bundled images don't
+    # use this naming format.
+    if not re.fullmatch(r"[0-9a-f]{32}_.+\.(png|jpg|gif|webp)", image_name, re.IGNORECASE):
+        return
+
+    media_root = MEDIA_DIRECTORY.resolve()
+    image_path = (MEDIA_DIRECTORY / image_name).resolve()
+    if image_path.parent != media_root:
+        return
+
+    image_path.unlink(missing_ok=True)
 
 @app.errorhandler(RequestEntityTooLarge)
 def handle_large_upload(error):
@@ -61,9 +80,14 @@ def get_quiz_question(question_id):
 
 @app.route("/questions-and-answers/<int:question_id>", methods=["DELETE"])
 def delete_quiz_question(question_id):
+    existing = data.get_question(question_id)
+    if existing is None:
+        return jsonify({"error": f"No question found with ID {question_id}"}), 404
+
     deleted = data.delete_question(question_id)
     if not deleted:
         return jsonify({"error": f"No question found with ID {question_id}"}), 404
+    delete_uploaded_image(existing["img"])
     return "", 204
 
 @app.route("/questions-and-answers/<int:question_id>", methods=["PUT"])
@@ -77,6 +101,7 @@ def replace_question(question_id):
     game = request.form.get("game", "").strip()
     image = request.form.get("img", existing["img"])
     uploaded_image = request.files.get("image")
+    image_contents = None
     if uploaded_image and uploaded_image.filename:
         image_contents = uploaded_image.read()
         if len(image_contents) > MAX_IMAGE_SIZE:
@@ -94,9 +119,26 @@ def replace_question(question_id):
         image = f"{uuid.uuid4().hex}_{original_stem}{extension}"
     if not question or not correct_answer or not game or len(incorrect_answers) != 3:
         return jsonify({"error": "All question fields are required"}), 400
+
+    if image_contents is not None:
+        MEDIA_DIRECTORY.mkdir(parents=True, exist_ok=True)
+        (MEDIA_DIRECTORY / image).write_bytes(image_contents)
+
     question_obj = (question, correct_answer, incorrect_answers, game, image)
-    if not data.replace_question(question_id, question_obj):
+    try:
+        replaced = data.replace_question(question_id, question_obj)
+    except Exception:
+        if image_contents is not None:
+            delete_uploaded_image(image)
+        raise
+
+    if not replaced:
+        if image_contents is not None:
+            delete_uploaded_image(image)
         return jsonify({"error": "Question not found"}), 404
+
+    if image_contents is not None and image != existing["img"]:
+        delete_uploaded_image(existing["img"])
     return "", 204
 
 @app.route("/questions_and_answers", methods=["POST"])
