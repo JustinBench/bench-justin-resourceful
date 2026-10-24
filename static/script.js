@@ -146,7 +146,7 @@ function createReviewQuestion(questionObj) {
         if (!confirmed) return;
         deleteButton.disabled = true;
         try {
-            const response = await fetch(`/questions-and-answers/${questionObj.id}`, {method: 'DELETE'});
+            const response = await fetch(`/questions_and_answers/${questionObj.id}`, {method: 'DELETE'});
             if (response.status === 404) {
                 throw new Error('This question was already deleted or could not be found.');
             }
@@ -246,7 +246,7 @@ async function selectQuestionIds(requestAmount) {
 }
 
 async function fetchQuestionById(id) {
-    const response = await fetch(`/questions-and-answers/${id}`);
+    const response = await fetch(`/questions_and_answers/${id}`);
 
     if (!response.ok) {
         throw new Error(`Could not retrieve question ${id}: ${response.status}`)
@@ -401,7 +401,7 @@ async function showQuestionEditor(question, card) {
 
         try {
             const response = await fetch(
-                `/questions-and-answers/${question.id}`, {
+                `/questions_and_answers/${question.id}`, {
                     method: 'PUT',
                     body: new FormData(form)
                 }

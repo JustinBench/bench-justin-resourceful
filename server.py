@@ -1,7 +1,7 @@
 import json
 import re
 import uuid
-import data
+from data import DataBase
 from pathlib import Path
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
@@ -9,10 +9,11 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-data.create_table()
+db = DataBase()
+db.create_table()
 MAX_IMAGE_SIZE = 5 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = MAX_IMAGE_SIZE + 64 * 1024
-CORS(app, origins=["https://opentdb.com"])
+CORS(app, origins=[])
 
 MEDIA_DIRECTORY = Path(__file__).parent / "static" / "media"
 
@@ -68,31 +69,31 @@ def review():
 
 @app.route("/questions_and_answers", methods=["GET"])
 def get_questions_and_answers():
-    questions = data.give_questions()
+    questions = db.give_questions()
     return jsonify(questions), 200
 
-@app.route("/questions-and-answers/<int:question_id>", methods=["GET"])
+@app.route("/questions_and_answers/<int:question_id>", methods=["GET"])
 def get_quiz_question(question_id):
-    question = data.get_question(question_id)
+    question = db.get_question(question_id)
     if question is None:
         return jsonify({"error": f"No question found with ID {question_id}"}), 404
     return jsonify(question), 200
 
-@app.route("/questions-and-answers/<int:question_id>", methods=["DELETE"])
+@app.route("/questions_and_answers/<int:question_id>", methods=["DELETE"])
 def delete_quiz_question(question_id):
-    existing = data.get_question(question_id)
+    existing = db.get_question(question_id)
     if existing is None:
         return jsonify({"error": f"No question found with ID {question_id}"}), 404
 
-    deleted = data.delete_question(question_id)
+    deleted = db.delete_question(question_id)
     if not deleted:
         return jsonify({"error": f"No question found with ID {question_id}"}), 404
     delete_uploaded_image(existing["img"])
     return "", 204
 
-@app.route("/questions-and-answers/<int:question_id>", methods=["PUT"])
+@app.route("/questions_and_answers/<int:question_id>", methods=["PUT"])
 def replace_question(question_id):
-    existing = data.get_question(question_id)
+    existing = db.get_question(question_id)
     if existing is None:
         return jsonify({"error": "Question not found"}), 404
     question = request.form.get("question", "").strip()
@@ -126,7 +127,7 @@ def replace_question(question_id):
 
     question_obj = (question, correct_answer, incorrect_answers, game, image)
     try:
-        replaced = data.replace_question(question_id, question_obj)
+        replaced = db.replace_question(question_id, question_obj)
     except Exception:
         if image_contents is not None:
             delete_uploaded_image(image)
@@ -231,7 +232,7 @@ def post_new_question():
         MEDIA_DIRECTORY.mkdir(parents=True, exist_ok=True)
         (MEDIA_DIRECTORY / new_question[4]).write_bytes(image_contents)
 
-    if data.add_question(new_question):
+    if db.add_question(new_question):
         return "", 201
     else:
         return jsonify({"error": "Could not save question"}), 500
