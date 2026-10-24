@@ -66,6 +66,39 @@ def delete_quiz_question(question_id):
         return jsonify({"error": f"No question found with ID {question_id}"}), 404
     return "", 204
 
+@app.route("/questions-and-answers/<int:question_id>", methods=["PUT"])
+def replace_question(question_id):
+    existing = data.get_question(question_id)
+    if existing is None:
+        return jsonify({"error": "Question not found"}), 404
+    question = request.form.get("question", "").strip()
+    correct_answer = request.form.get("correct_answer", "").strip()
+    incorrect_answers = [answer.strip() for answer in request.form.getlist("incorrect_answers")]
+    game = request.form.get("game", "").strip()
+    image = request.form.get("img", existing["img"])
+    uploaded_image = request.files.get("image")
+    if uploaded_image and uploaded_image.filename:
+        image_contents = uploaded_image.read()
+        if len(image_contents) > MAX_IMAGE_SIZE:
+            return jsonify({
+                "error": "Uploaded files must be 5 MB or smaller"
+            }), 413
+
+        extension = image_extension(image_contents)
+        if extension is None:
+            return jsonify({
+                "error": "Upload a valid PNG, JPEG, GIF, or WebP image"
+            }), 400
+
+        original_stem = secure_filename(Path(uploaded_image.filename).stem) or "question-image"
+        image = f"{uuid.uuid4().hex}_{original_stem}{extension}"
+    if not question or not correct_answer or not game or len(incorrect_answers) != 3:
+        return jsonify({"error": "All question fields are required"}), 400
+    question_obj = (question, correct_answer, incorrect_answers, game, image)
+    if not data.replace_question(question_id, question_obj):
+        return jsonify({"error": "Question not found"}), 404
+    return "", 204
+
 @app.route("/questions_and_answers", methods=["POST"])
 def post_new_question():
     if request.is_json:

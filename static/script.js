@@ -134,6 +134,7 @@ function createReviewQuestion(questionObj) {
     editButton.classList.add('edit-question-button');
     editButton.textContent = 'Edit question';
     editButton.setAttribute('aria-label', `Edit question ${questionObj.id}`);
+    editButton.addEventListener('click', () => {showQuestionEditor(questionObj, newReviewQuestion)});
 
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
@@ -331,6 +332,94 @@ async function submitQuestion(question, correctAnswer, incorrectAnswers, game, u
     const result_message = document.getElementById('form-result-message');
     result_message.textContent = message;
     result_message.classList.remove('hidden');
+}
+
+function addEditorField(form, labelText, name, value, type = 'text') {
+    const label = document.createElement('label');
+    label.textContent = labelText;
+
+    const input = document.createElement('input');
+    input.type = type;
+    input.name = name;
+    input.value = value ?? '';
+    input.required = type !== 'file';
+
+    if (type === 'file') {
+        input.accept = 'image/png,image/jpeg,image/gif,image/webp';
+    }
+
+    label.appendChild(input);
+    form.appendChild(label);
+    return input;
+}
+
+async function showQuestionEditor(question, card) {
+    const form = document.createElement('form');
+    form.classList.add('question-edit-form');
+
+    addEditorField(form, 'Question', 'question', question.question);
+
+    const gameField = document.createElement('input');
+        gameField.type = 'hidden';
+        gameField.name = 'game';
+        gameField.value = question.game;
+        form.appendChild(gameField);
+    
+    addEditorField(form, 'Correct Answer', 'correct_answer', question.correct_answer);
+
+    question.incorrect_answers.forEach((answer, index) => {
+        addEditorField(
+            form,
+            `Incorrect answer ${index + 1}`,
+            'incorrect_answers',
+            answer
+        );
+    });
+
+    addEditorField(form, '', 'img', question.img, 'hidden');
+    addEditorField(form, 'Replace image (optional)', 'image', '', 'file');
+
+    const message = document.createElement('p');
+    message.setAttribute('role', 'status');
+    form.appendChild(message);
+
+    const saveButton = document.createElement('button');
+    saveButton.type = 'submit';
+    saveButton.textContent = 'Save';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.type = 'button';
+    cancelButton.textContent = 'Cancel';
+    cancelButton.addEventListener('click', loadReviewQuestions);
+
+    form.append(saveButton, cancelButton);
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        saveButton.disabled = true;
+        message.textContent = '';
+
+        try {
+            const response = await fetch(
+                `/questions-and-answers/${question.id}`, {
+                    method: 'PUT',
+                    body: new FormData(form)
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || `Save failed: ${response.status}`);
+            }
+
+            await loadReviewQuestions();
+        } catch (error) {
+            message.textContent = error.message;
+            saveButton.disabled = false;
+        }
+    });
+
+    card.replaceChildren(form);
 }
 
 const imageInput = document.getElementById('image-input');

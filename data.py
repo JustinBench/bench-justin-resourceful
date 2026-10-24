@@ -114,3 +114,27 @@ def delete_question(id: int) -> bool:
         return cur.rowcount > 0
     finally:
         close_connection(con)
+
+def replace_question(id: int, obj: tuple) -> bool:
+    con, cur = open_connection()
+    try:
+        cur.execute("""
+            UPDATE question
+            SET text = ?,
+                correct_answer = ?,
+                incorrect_answers = ?,
+                game = ?,
+                img = ?
+            WHERE id = ?
+        """, (
+            obj[0],
+            obj[1],
+            json.dumps(obj[2]),
+            obj[3],
+            obj[4],
+            id,
+        ))
+        con.commit()
+        return cur.rowcount > 0
+    finally:
+        close_connection(con)
