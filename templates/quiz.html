@@ -21,6 +21,7 @@
              </ul>
         </nav>
         <main>
+            <p id="quiz-message" role="status" aria-live="polite"></p>
             <form id="question-amount-form" onsubmit="loadLocalQuestions(Number(this.elements.amount.value)); return false;">
                 <label for="question-amount">Number of questions (0 for all)</label>
                 <input id="question-amount" name="amount" type="number" min="0" value="0" required>

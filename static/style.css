@@ -575,6 +575,11 @@ a:focus-visible {
 
 #review-header {
     text-align: center;
+    color: var(--ink);
+}
+
+#quiz-message {
+    text-align: center;
 }
 
 #result-container {

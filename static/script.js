@@ -181,6 +181,10 @@ async function loadReviewQuestions() {
     try {
         const questions = await fetchQuestions();
         reviewSection.replaceChildren();
+        if (questions.length === 0) {
+            document.getElementById("quiz-message").textContent = "There are no questions available. Add a question before starting a quiz.";
+            return;
+        }
         questions.forEach(createReviewQuestion);
     } catch (error) {
         console.error('Unable to load review questions:', error);
@@ -258,6 +262,12 @@ async function fetchQuestionById(id) {
 async function loadLocalQuestions(amount=0) {
     try {
         const ids = await selectQuestionIds(amount);
+
+        if (ids.length === 0) {
+            document.getElementById("quiz-message").textContent = "There are no questions available. Add a question before starting a quiz.";
+            start_quiz_form.classList.add('hidden');
+            return;
+        }
 
         for (let index = 0; index < ids.length; index++) {
             const question = await fetchQuestionById(ids[index]);
