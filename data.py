@@ -22,7 +22,7 @@ class DataBase:
     def create_table(self):
         self.open_connection()
         try:
-            schema = SCHEMA_PATH.read_text(encode="utf-8")
+            schema = SCHEMA_PATH.read_text(encoding="utf-8")
             self.con.executescript(schema)
             self.con.commit()
         finally:
