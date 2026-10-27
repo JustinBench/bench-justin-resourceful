@@ -111,6 +111,7 @@ Open `http://127.0.0.1:5000/` in a browser. Keep the server running while using 
 - `static/style.css` — page and component styling.
 - `static/media/` — bundled and uploaded question images.
 - `requirements.txt` — Python package dependencies.
+- `schema.sql` — SQLite table schema.
 
 # Notes
 
