@@ -111,3 +111,11 @@ Open `http://127.0.0.1:5000/` in a browser. Keep the server running while using 
 - `static/style.css` — page and component styling.
 - `static/media/` — bundled and uploaded question images.
 - `requirements.txt` — Python package dependencies.
+
+# Notes
+
+Relational Databases have tables with attributes that may relate to each other. Perhaps the "game" field was a expanded to a new table, where every game instance had the title of the game, the dungeons in the game, the items in the game, the final boss, etc. Then the "game" field in the quesiton instance would relate to the game in the game table.
+
+This assignment uses SQL but doesn't really need to since it's just one table. Key-value stores, like dictionaries, are non-relational.
+
+CSS and SQL are similar languages in that the process or desired outcome is described rather than actually written out. You tell CSS what properties you want applied to what elements, and you tell SQL what objects you want based on what fields meet certain criteria or whatever. You don't actually have to write out procedures with for loops and if statements.

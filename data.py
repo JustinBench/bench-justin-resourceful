@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 DATABASE_PATH = Path(__file__).resolve().parent / "questions.db"
+SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
 class DataBase:
     def __init__(self):
@@ -20,18 +21,12 @@ class DataBase:
 
     def create_table(self):
         self.open_connection()
-        self.cur.execute("""
-            CREATE TABLE IF NOT EXISTS question (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                text TEXT NOT NULL,
-                correct_answer TEXT NOT NULL,
-                incorrect_answers TEXT NOT NULL,
-                game TEXT NOT NULL,
-                img TEXT NOT NULL,
-                UNIQUE(game, text)
-            );
-        """)
-        self.close_connection()
+        try:
+            schema = SCHEMA_PATH.read_text(encode="utf-8")
+            self.con.executescript(schema)
+            self.con.commit()
+        finally:
+            self.close_connection()
 
     def add_question(self, question_obj: tuple) -> bool:
         self.open_connection()
